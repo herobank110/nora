@@ -29,19 +29,37 @@
             return ctx.createImageData(c.width, c.height);
         }
 
-        /** @typedef {{x: number, y: number, z: number}} vec */
+        Object.defineProperty(Array.prototype, "x", { get() { return this[0] } })
+        Object.defineProperty(Array.prototype, "y", { get() { return this[1] } })
+        Object.defineProperty(Array.prototype, "z", { get() { return this[2] } })
+
+        /** @typedef {[number, number,number]} vec_impl */
+        /** @typedef {vec_impl|{x: number, y: number, z: number}} vec */
         /** @typedef {{c: vec, r: number}} sphere */
-        /** @typedef {{u: vec}} plane */
+        /** @typedef {{u: vec, t: number}} plane */
         /** @typedef {(sphere | plane)[]} scene */
 
-        /** @returns {scene} */
-        function makeScene() {
-            return []
-       }
+        /**
+         * my scene is a 2x2x2m box with a sphere in it
+         * 
+         * directions: up y axis, right x axis
+         * units: centimeters
+         * 
+         * @returns {scene}
+         * */
+        function makeCornellBox() {
+            return [
+                { c: [10, 20, 0], r: 20 },  // sphere
+                { u: [1, 0, 0], t: -100 },  // left
+                { u: [1, 0, 0], t: 100 },  // right
+                { u: [0, 1, 0], t: 0 },  // floor
+                { u: [0, 1, 0], t: 200 },  // ceiling
+                // TODO: light?
+            ]
+        }
 
         function renderScene(scene, buffer) {
-            
-            // create scene with Cornell box
+
             // camera trace rays equal distance and direction from sensor pos, size, fov (get each pixel initial ray vector)
             // trace scene until collision with sphere or plane
             // calculate reflection angle
