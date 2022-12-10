@@ -16,7 +16,7 @@
 
         function main() {
             const buffer = makeImageBuffer();
-            const scene = makeCornellBox();
+            const scene = makeGeo();
             renderScene(scene, buffer);
             showImage(buffer);
         }
@@ -33,13 +33,19 @@
         Object.defineProperty(Array.prototype, "y", { get() { return this[1] } })
         Object.defineProperty(Array.prototype, "z", { get() { return this[2] } })
 
-        /** @typedef {[number, number,number]} vec_impl */
-        /** @typedef {vec_impl|{x: number, y: number, z: number}} vec */
+        /** @typedef {[number, number, number]} vec_impl */
+        /** @typedef {vec_impl | {x: number, y: number, z: number}} vec */
         /** @typedef {{c: vec, r: number}} sphere */
         /** @typedef {{u: vec, t: number}} plane */
         /** @typedef {(sphere | plane)[]} scene */
+        /** @typedef {{
+          p: vec,
+          horizontal_fov: number
+          }} camera */
 
         /**
+         * defines scene geometry as list of objects
+         * 
          * my scene is a 2x2x2m box with a sphere in it
          * 
          * directions: up y axis, right x axis
@@ -47,15 +53,20 @@
          * 
          * @returns {scene}
          * */
-        function makeCornellBox() {
+        function makeGeo() {
             return [
                 { c: [10, 20, 0], r: 20 },  // sphere
-                { u: [1, 0, 0], t: -100 },  // left
-                { u: [1, 0, 0], t: 100 },  // right
-                { u: [0, 1, 0], t: 0 },  // floor
-                { u: [0, 1, 0], t: 200 },  // ceiling
+                { u: [1, 0, 0], t: -100 },  // left plane
+                { u: [1, 0, 0], t: 100 },  // right plane
+                { u: [0, 1, 0], t: 0 },  // floor plane
+                { u: [0, 1, 0], t: 200 },  // ceiling plane
                 // TODO: light? material camera?
             ]
+        }
+
+        /** @returns {camera} */
+        function makeCamera() {
+            return { p: [0, 100, 0], horizontal_fov: 75 }
         }
 
         /**
