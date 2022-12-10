@@ -16,7 +16,7 @@
 
         function main() {
             const buffer = makeImageBuffer();
-            const scene = makeScene();
+            const scene = makeCornellBox();
             renderScene(scene, buffer);
             showImage(buffer);
         }
@@ -54,10 +54,14 @@
                 { u: [1, 0, 0], t: 100 },  // right
                 { u: [0, 1, 0], t: 0 },  // floor
                 { u: [0, 1, 0], t: 200 },  // ceiling
-                // TODO: light?
+                // TODO: light? material camera?
             ]
         }
 
+        /**
+         * @param {scene} scene
+         * @param {ImageData} buffer
+         */
         function renderScene(scene, buffer) {
 
             // camera trace rays equal distance and direction from sensor pos, size, fov (get each pixel initial ray vector)
