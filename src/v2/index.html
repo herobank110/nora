@@ -10,16 +10,39 @@
 <body>
     <canvas width="200" height="200"></canvas>
     <script>
-        let c = document.querySelector("canvas")
-        let ctx = c.getContext("2d")
-        let data = ctx.createImageData(200, 200);
-        for (let i = 0; i < data.data.length; i += 4) {
-            data.data[i] = 255
-            data.data[i + 1] = 0
-            data.data[i + 2] = 0
-            data.data[i + 3] = 255
+
+        let c = document.querySelector("canvas");
+        let ctx = c.getContext("2d");
+        main();
+
+        function main() {
+            const buffer = makeImageBuffer();
+            renderImage(buffer);
+            showImage(buffer);
+            // create scene with Cornell box
+            // camera trace rays equal distance and direction from sensor pos, size, fov (get each pixel initial ray vector)
+            // trace scene until collision with sphere or plane
+            // calculate reflection angle
+            // material can set ratio reflectivity: absorption:,  
         }
-        ctx.putImageData(data, 0, 0);
+
+        /** write imagedata to screen */
+        function showImage(imageData) {
+            ctx.putImageData(imageData, 0, 0);
+        }
+
+        function makeImageBuffer() {
+            return ctx.createImageData(c.width, c.height);
+        }
+
+        function renderImage(buffer) {
+            for (let i = 0; i < buffer.data.length; i += 4) {
+                buffer.data[i] = 255
+                buffer.data[i + 1] = 0
+                buffer.data[i + 2] = 0
+                buffer.data[i + 3] = 255
+            }
+        }
     </script>
 </body>
 
