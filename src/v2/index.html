@@ -17,16 +17,11 @@
 
         function main() {
             const buffer = makeImageBuffer();
-            renderImage(buffer);
+            const scene = makeScene();
+            renderScene(scene, buffer);
             showImage(buffer);
-            // create scene with Cornell box
-            // camera trace rays equal distance and direction from sensor pos, size, fov (get each pixel initial ray vector)
-            // trace scene until collision with sphere or plane
-            // calculate reflection angle
-            // material can set ratio reflectivity: absorption:,  
         }
 
-        /** write imagedata to screen */
         function showImage(imageData) {
             ctx.putImageData(imageData, 0, 0);
         }
@@ -35,7 +30,18 @@
             return ctx.createImageData(c.width, c.height);
         }
 
-        function renderImage(buffer) {
+        function makeScene() {
+            return [];
+        }
+
+        function renderScene(scene, buffer) {
+            
+            // create scene with Cornell box
+            // camera trace rays equal distance and direction from sensor pos, size, fov (get each pixel initial ray vector)
+            // trace scene until collision with sphere or plane
+            // calculate reflection angle
+            // material can set ratio reflectivity: absorption:,  
+
             for (let i = 0; i < buffer.data.length; i += 4) {
                 buffer.data[i] = 255
                 buffer.data[i + 1] = 0
