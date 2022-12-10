@@ -1,11 +1,16 @@
 // nora.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
+#include "Windows.h"
+#include "wingdi.h"
+#include <gdiplus.h>
 #include <iostream>
 
 int main()
 {
-    std::cout << "Hello World!\n";
+
+    Gdiplus::Bitmap(100, 100, PixelFormat8bppIndexed, Data);
+    std::cout << "Hello World!\n"; 
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
