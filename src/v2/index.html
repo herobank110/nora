@@ -149,8 +149,6 @@
          * @param {screen} s
          */
         function renderScene(buffer, geo, c, s) {
-            // camera trace rays equal distance and direction from sensor pos,
-            // size, fov (get each pixel initial ray vector)
             for (let i = 0; i < s.h * s.w; i++) {
                 const ray = castCameraRay(c, s, i);
                 const p = findClosestIntersectingPlane(geo, ray)
