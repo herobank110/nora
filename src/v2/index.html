@@ -8,7 +8,7 @@
 </head>
 
 <body>
-    <canvas width="200" height="200"></canvas>
+    <canvas width="300" height="200"></canvas>
     <script>
         let g_canvas = document.querySelector("canvas");
         let g_ctx = g_canvas.getContext("2d");
@@ -139,7 +139,7 @@
 
         /** @returns {camera} */
         function makeCamera() {
-            return { p: [0, 100, -200], u: qFromAxisAngle([0, 0, 1], 0), hFov: 70 }
+            return { p: [0, 100, 0], u: qFromAxisAngle([0, 0, 1], 0), hFov: 70 }
         }
 
         /**
@@ -154,10 +154,9 @@
             for (let i = 0; i < s.h * s.w; i++) {
                 const ray = castCameraRay(c, s, i);
                 const p = findClosestIntersectingPlane(geo, ray)
-                const [x, y, z] = ray.u;
-                buffer.data[(i * 4) + 0] = [130, 200, 150, 200][p]
-                buffer.data[(i * 4) + 1] = 0
-                buffer.data[(i * 4) + 2] = 0
+                buffer.data[(i * 4) + 0] = [100, 0, 0, 0][p]
+                buffer.data[(i * 4) + 1] = [0, 100, 0, 0][p]
+                buffer.data[(i * 4) + 2] = [0, 0, 100, 0][p]
                 buffer.data[(i * 4) + 3] = 255
             }
 
