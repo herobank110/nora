@@ -36,8 +36,18 @@
             return g_ctx.createImageData(s.w, s.h);
         }
 
+        /** @returns {vec} */
+        function vAdd([ax, ay, az], [bx, by, bz]) {
+            return [ax + bx, ay + by, az + bz];
+        }
+
+        /** @returns {vec} */
+        function vSub([ax, ay, az], [bx, by, bz]) {
+            return [ax - bx, ay - by, az - bz];
+        }
+
         function vDot([ax, ay, az], [bx, by, bz]) {
-            return [ax * bx, ay * by, az * bz];
+            return ax * bx + ay * by + az * bz;
         }
 
         /** @returns {vec} */
@@ -84,6 +94,10 @@
             return a + (b - a) * x;
         }
 
+        function degToRad(x) {
+            return x / (360 / (2 * Math.PI));
+        }
+
         /** @typedef {[number, number, number]} vec_impl */
         /** @typedef {vec_impl | {x: number, y: number, z: number}} vec */
         /** @typedef {[number, number, number, number]} quat_impl */
@@ -118,7 +132,7 @@
 
         /** @returns {camera} */
         function makeCamera() {
-            return { p: [0, 100, 0], u: qFromAxisAngle([0, 0, 1], 0), hFov: 75 }
+            return { p: [0, 100, 0], u: qFromAxisAngle([0, 0, 1], 0), hFov: 70 }
         }
 
         /**
@@ -133,22 +147,22 @@
             for (let i = 0; i < s.h * s.w; i++) {
                 const ray = castCameraRay(c, s, i);
                 const [x, y, z] = ray.u;
-                buffer.data[(i * 4) + 0] = x <0 ? 255 : 0;
+                buffer.data[(i * 4) + 0] = Math.abs(z) * 255;
                 buffer.data[(i * 4) + 1] = 0
                 buffer.data[(i * 4) + 2] = 0
                 buffer.data[(i * 4) + 3] = 255
             }
 
-                // trace scene until collision with sphere or plane
-                // calculate reflection angle
-                // material can set ratio reflectivity: absorption:,  
+            // trace scene until collision with sphere or plane
+            // calculate reflection angle
+            // material can set ratio reflectivity: absorption:,  
 
-                // for (let i = 0; i < buffer.data.length; i += 4) {
-                //     buffer.data[i] = 255
-                //     buffer.data[i + 1] = 255
-                //     buffer.data[i + 2] = 255
-                //     buffer.data[i + 3] = 255
-                // }
+            // for (let i = 0; i < buffer.data.length; i += 4) {
+            //     buffer.data[i] = 255
+            //     buffer.data[i + 1] = 255
+            //     buffer.data[i + 2] = 255
+            //     buffer.data[i + 3] = 255
+            // }
         }
 
         /** @param {camera} c @param {screen} s */
@@ -158,20 +172,33 @@
 
         /** @param {camera} c @param {screen} s @param {number} i @returns {ray} */
         function castCameraRay(c, s, i) {
-            let row = Math.floor(i / s.w);
-            let col = i % s.w;
+            const row = Math.floor(i / s.w);
+            const col = i % s.w;
 
-            // TODO: fov deg to rad!
-            let angleW = lerp1(-c.hFov / 2, c.hFov / 2, col / s.w);
-            let vFov = getVFov(c, s);
-            let angleH = lerp1(vFov / 2, -vFov / 2, row / s.h);
+            const hFov = degToRad(c.hFov);
+            const vFov = degToRad(getVFov(c, s));
 
-            let qW = qFromAxisAngle([0, 1, 0], angleW);
-            let qH = qFromAxisAngle([-1, 0, 0], angleH);
+            const angleW = lerp1(hFov / 2, hFov / 2, col / s.w);
+            const angleH = lerp1(vFov / 2, -vFov / 2, row / s.h);
 
-            let q = qMult(qMult(c.u, qW), qH);
-            let [axis] = qToAxisAngle(q)
+            const qW = qFromAxisAngle([0, 1, 0], angleW);
+            const qH = qFromAxisAngle([-1, 0, 0], angleH);
+
+            const q = qMult(qMult(c.u, qW), qH);
+            const [axis] = qToAxisAngle(q)
             return { p: c.p, u: axis };
+        }
+
+        /** @param {ray} r @param {sphere} s @returns {undefined|vec[]]} */
+        function intersectRaySphere(r, s) {
+            const L = s.c - r.p;
+            const tc = dot(L, r.u);
+            if (tc < 0.0) return;
+            const d2 = (tc * tc) - (L * L);
+            const r2 = s.r * s.r;
+            if (d2 > r2) return;
+            const t1c = Math.sqrt(r2 - d2);
+            return [tc - t1c, tc + t1c];
         }
     </script>
 </body>
