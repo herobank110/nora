@@ -60,6 +60,10 @@
             return [ay * bz - az * by, az * bx - ax * bz, ax * by - ay * bx]
         }
 
+        function vLen([x, y, z]) {
+            return Math.sqrt(x * x + y * y + z * z);
+        }
+
         /** @returns {quat} */
         function qFromAxisAngle([x, y, z], a) {
             let s = Math.sin(a / 2);
@@ -103,10 +107,8 @@
             return x / (360 / (2 * Math.PI));
         }
 
-        /** @typedef {[number, number, number]} vec_impl */
-        /** @typedef {vec_impl | {x: number, y: number, z: number}} vec */
-        /** @typedef {[number, number, number, number]} quat_impl */
-        /** @typedef {quat_impl | {x: number, y: number, z: number, w: number}} quat */
+        /** @typedef {[number, number, number]} vec (xyz) */
+        /** @typedef {[number, number, number, number]} quat  (wxyz) */
         /** @typedef {{c: vec, r: number}} sphere */
         /** @typedef {{u: vec, t: number}} plane */
         /** @typedef {{p: vec, u: vec}} ray */
@@ -126,7 +128,7 @@
          * */
         function makeGeo() {
             return [
-                { c: [10, 20, 0], r: 20 },  // sphere
+                // { c: [10, 20, 0], r: 20 },  // sphere
                 { u: [1, 0, 0], t: -100 },  // left plane
                 { u: [1, 0, 0], t: 100 },  // right plane
                 { u: [0, 1, 0], t: 0 },  // floor plane
@@ -137,7 +139,7 @@
 
         /** @returns {camera} */
         function makeCamera() {
-            return { p: [0, 100, 0], u: qFromAxisAngle([0, 0, 1], 0), hFov: 70 }
+            return { p: [0, 100, -200], u: qFromAxisAngle([0, 0, 1], 0), hFov: 70 }
         }
 
         /**
@@ -151,8 +153,9 @@
             // size, fov (get each pixel initial ray vector)
             for (let i = 0; i < s.h * s.w; i++) {
                 const ray = castCameraRay(c, s, i);
+                const p = findClosestIntersectingPlane(geo, ray)
                 const [x, y, z] = ray.u;
-                buffer.data[(i * 4) + 0] = Math.abs(z) * 255;
+                buffer.data[(i * 4) + 0] = [130, 200, 150, 200][p]
                 buffer.data[(i * 4) + 1] = 0
                 buffer.data[(i * 4) + 2] = 0
                 buffer.data[(i * 4) + 3] = 255
@@ -210,9 +213,20 @@
         function intersectRayPlane(r, p) {
             const denom = vDot(p.u, r.u);
             if (Math.abs(denom) <= 1e-4) return;
-            const t = -(vDot(n, p) + p.t) / vDot(p.u, r.u);
+            const t = -(vDot(p.u, r.p) + p.t) / vDot(p.u, r.u);
             if (t <= 1e-4) return;
             return vAdd(r.p, vMul(r.u, t));
+        }
+
+        /** @param {plane[]} ps @param {ray} r @returns plane index */
+        function findClosestIntersectingPlane(ps, r) {
+            return ps
+                .map((p, i) => [i, intersectRayPlane(r, p)])
+                .filter(([_, x]) => x)
+                .map(([i, x]) => [i, vLen(vSub(x, r.p))])
+                .sort(([_, d1], [__, d2]) => d1 - d2)
+                .map(([i]) => i)
+                .find(_ => 1)
         }
 
     </script>
