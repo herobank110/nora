@@ -154,22 +154,11 @@
             for (let i = 0; i < s.h * s.w; i++) {
                 const ray = castCameraRay(c, s, i);
                 const p = findClosestIntersectingPlane(geo, ray)
-                buffer.data[(i * 4) + 0] = [100, 0, 0, 0][p]
-                buffer.data[(i * 4) + 1] = [0, 100, 0, 0][p]
-                buffer.data[(i * 4) + 2] = [0, 0, 100, 0][p]
-                buffer.data[(i * 4) + 3] = 255
+                buffer.data[(i * 4) + 0] = [100, 0, 0, 0][p];
+                buffer.data[(i * 4) + 1] = [0, 100, 0, 0][p];
+                buffer.data[(i * 4) + 2] = [0, 0, 100, 0][p];
+                buffer.data[(i * 4) + 3] = 255;
             }
-
-            // trace scene until collision with sphere or plane
-            // calculate reflection angle
-            // material can set ratio reflectivity: absorption:,  
-
-            // for (let i = 0; i < buffer.data.length; i += 4) {
-            //     buffer.data[i] = 255
-            //     buffer.data[i + 1] = 255
-            //     buffer.data[i + 2] = 255
-            //     buffer.data[i + 3] = 255
-            // }
         }
 
         /** @param {camera} c @param {screen} s */
