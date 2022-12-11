@@ -132,7 +132,8 @@
             // size, fov (get each pixel initial ray vector)
             for (let i = 0; i < s.h * s.w; i++) {
                 const ray = castCameraRay(c, s, i);
-                buffer.data[(i * 4) + 0] = 255
+                const [x, y, z] = ray.u;
+                buffer.data[(i * 4) + 0] = x <0 ? 255 : 0;
                 buffer.data[(i * 4) + 1] = 0
                 buffer.data[(i * 4) + 2] = 0
                 buffer.data[(i * 4) + 3] = 255
