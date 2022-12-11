@@ -30,6 +30,21 @@
             return g_ctx.createImageData(g_canvas.width, g_canvas.height);
         }
 
+
+        class Quat {
+            /** @param {number} a @param {number} b @param {number} c @param {number} d */
+            constructor(a, b, c, d) {
+                Object.assign(this, { a, b, c, d });
+            }
+
+            /** @param {Quat} other */
+            combine(other) {
+                other.combine
+                return new Quat(1, 2, 3, 4)
+            }
+        }
+
+        console.log(new Quat(1, 2, 3, 4).combine(2));
         Object.defineProperty(Array.prototype, "x", { get() { return this[0] } })
         Object.defineProperty(Array.prototype, "y", { get() { return this[1] } })
         Object.defineProperty(Array.prototype, "z", { get() { return this[2] } })
@@ -98,7 +113,7 @@
          * @param {number} i
          * @returns {vec} line of ray */
         function castCameraRay(camera, i) {
-            
+
 
         }
     </script>
