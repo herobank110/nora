@@ -217,7 +217,7 @@
             return vAdd(r.p, vMul(r.u, t));
         }
 
-        /** @param {plane[]} ps @param {ray} r @returns plane index */
+        /** @param {plane[]} ps @param {ray} r @returns {number} plane index */
         function findClosestIntersectingPlane(ps, r) {
             return ps
                 .map((p, i) => [i, intersectRayPlane(r, p)])
