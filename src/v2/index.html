@@ -194,17 +194,27 @@
             return { p: c.p, u: axis };
         }
 
-        /** @param {ray} r @param {sphere} s @returns {undefined|vec[]]} */
-        function intersectRaySphere(r, s) {
-            const L = vSub(s.c, r.p);
-            const tc = vDot(L, r.u);
-            if (tc < 0.0) return;
-            const d2 = (tc * tc) - (L * L);
-            const r2 = s.r * s.r;
-            if (d2 > r2) return;
-            const t1c = Math.sqrt(r2 - d2);
-            return [tc - t1c, tc + t1c];
+        // /** @param {ray} r @param {sphere} s @returns {undefined|vec[]]} */
+        // function intersectRaySphere(r, s) {
+        //     const L = vSub(s.c, r.p);
+        //     const tc = vDot(L, r.u);
+        //     if (tc < 0.0) return;
+        //     const d2 = (tc * tc) - (L * L);
+        //     const r2 = s.r * s.r;
+        //     if (d2 > r2) return;
+        //     const t1c = Math.sqrt(r2 - d2);
+        //     const intersections = [tc - t1c, tc + t1c];
+        // }
+
+        /** @param {ray} r @param {plane} p @returns {undefined|vec} */
+        function intersectRayPlane(r, p) {
+            const denom = vDot(p.u, r.u);
+            if (Math.abs(denom) <= 1e-4) return;
+            const t = -(vDot(n, p) + p.t) / vDot(p.u, r.u);
+            if (t <= 1e-4) return;
+            return vAdd(r.p, vMul(r.u, t));
         }
+
     </script>
 </body>
 
