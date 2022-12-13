@@ -154,15 +154,14 @@
 
         /** @param {camera} c @param {screen} s @param {number} i @returns {ray} */
         function castCameraRay(c, s, i) {
-            const hPx = Math.floor(i / s.w)
-            const vPx = i % s.w;
+            const vPx = Math.floor(i / s.w)
+            const hPx = i % s.w;
             const hFov = c.hFov;
             const vFov = getVFov(c, s);
             const hView = Math.tan(degToRad(hFov) / 2);
             const vView = Math.tan(degToRad(vFov) / 2);
-            const hScale = mapRange(hPx, 0, s.h - 1, -hView, hView);
-            const vScale = mapRange(vPx, 0, s.w - 1, vView, -vView);
-            console.log(`${hScale} ${vScale}`);
+            const hScale = mapRange(hPx, 0, s.w - 1, -hView, hView);
+            const vScale = mapRange(vPx, 0, s.h - 1, vView, -vView);
             return {
                 p: c.p,
                 u: vNorm(vAdd(c.fd, vAdd(vMul(c.rt, hScale), vMul(c.up, vScale))))
