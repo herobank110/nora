@@ -109,6 +109,7 @@
                 { u: [1, 0, 0], t: 100 },  // right plane
                 { u: [0, 1, 0], t: 0 },  // floor plane
                 { u: [0, 1, 0], t: 200 },  // ceiling plane
+                { u: [0, 0, -1], t: 400 },  // back plane
                 // TODO: light? material camera?
             ]
         }
@@ -128,9 +129,9 @@
             for (let i = 0; i < s.h * s.w; i++) {
                 const ray = castCameraRay(c, s, i);
                 const p = findClosestIntersectingPlane(geo, ray)
-                buffer.data[(i * 4) + 0] = [100, 0, 0, 0][p];
-                buffer.data[(i * 4) + 1] = [0, 100, 0, 100][p];
-                buffer.data[(i * 4) + 2] = [0, 0, 100, 100][p];
+                buffer.data[(i * 4) + 0] = [100, 0, 0, 0, 100][p];
+                buffer.data[(i * 4) + 1] = [0, 100, 0, 100, 100][p];
+                buffer.data[(i * 4) + 2] = [0, 0, 100, 100, 0][p];
                 buffer.data[(i * 4) + 3] = 255;
             }
         }
