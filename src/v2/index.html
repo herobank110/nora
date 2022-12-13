@@ -109,12 +109,12 @@
          * */
         function makeGeo() {
             return [
-                { ty: 's', c: [10, 20, 50], r: 0.001 },  // sphere
                 { ty: 'p', u: [1, 0, 0], t: 100 },  // left plane
                 { ty: 'p', u: [1, 0, 0], t: -100 },  // right plane
                 { ty: 'p', u: [0, 1, 0], t: 0 },  // floor plane
                 { ty: 'p', u: [0, 1, 0], t: -200 },  // ceiling plane
                 { ty: 'p', u: [0, 0, 1], t: -300 },  // back plane
+                // { ty: 's', c: [0, 20, 200], r: 10 },  // sphere
                 // TODO: light? material camera?
             ]
         }
