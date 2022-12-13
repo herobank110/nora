@@ -8,7 +8,7 @@
 </head>
 
 <body>
-    <canvas width="300" height="200"></canvas>
+    <canvas width="400" height="300"></canvas>
     <script>
         /** @typedef {[number, number, number]} vec (xyz) */
         /** @typedef {[number, number, number, number]} quat  (wxyz) */
@@ -108,15 +108,15 @@
                 { u: [1, 0, 0], t: -100 },  // left plane
                 { u: [1, 0, 0], t: 100 },  // right plane
                 { u: [0, 1, 0], t: 0 },  // floor plane
-                { u: [0, 1, 0], t: 200 },  // ceiling plane
-                { u: [0, 0, -1], t: 400 },  // back plane
+                { u: [0, 1, 0], t: -200 },  // ceiling plane
+                { u: [0, 0, 1], t: -300 },  // back plane
                 // TODO: light? material camera?
             ]
         }
 
         /** @returns {camera} */
         function makeCamera() {
-            return { p: [0, 100, 0], fd: [0, 0, 1], rt: [1, 0, 0], up: [0, 1, 0], hFov: 70 }
+            return { p: [0, 100, 0], fd: [0, 0, 1], rt: [1, 0, 0], up: [0, 1, 0], hFov: 75 }
         }
 
         /**
