@@ -80,18 +80,6 @@
             return vMul(v, vLen(v));
         }
 
-        /** @returns {vec} */
-        function rotate([x, y, z], [rw, rx, ry, rz]) {
-            return [
-                rw * rw * x + 2 * ry * rw * z - 2 * rz * rw * y + rx * rx * x + 2 * ry * rx * y
-                + 2 * rz * rx * z - rz * rz * x - ry * ry * x,
-                2 * rx * ry * x + ry * ry * y + 2 * rz * ry * z + 2 * rw * rz * x - rz * rz * y
-                + rw * rw * y - 2 * rx * rw * z - rx * rx * y,
-                2 * rx * rz * x + 2 * ry * rz * y + rz * rz * z - 2 * rw * ry * x - ry * ry * z
-                + 2 * rw * rx * y - rx * rx * z + rw * rw * z,
-            ]
-        }
-
         function lerp1(a, b, x) {
             return a + (b - a) * x;
         }
@@ -141,8 +129,8 @@
                 const ray = castCameraRay(c, s, i);
                 const p = findClosestIntersectingPlane(geo, ray)
                 buffer.data[(i * 4) + 0] = [100, 0, 0, 0][p];
-                buffer.data[(i * 4) + 1] = [0, 100, 0, 0][p];
-                buffer.data[(i * 4) + 2] = [0, 0, 100, 0][p];
+                buffer.data[(i * 4) + 1] = [0, 100, 0, 100][p];
+                buffer.data[(i * 4) + 2] = [0, 0, 100, 100][p];
                 buffer.data[(i * 4) + 3] = 255;
             }
         }
