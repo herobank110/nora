@@ -128,10 +128,10 @@
         function renderScene(buffer, geo, c, s) {
             for (let i = 0; i < s.h * s.w; i++) {
                 const ray = castCameraRay(c, s, i);
-                const p = findClosestIntersectingPlane(geo, ray)
-                buffer.data[(i * 4) + 0] = [100, 0, 0, 0, 100][p];
-                buffer.data[(i * 4) + 1] = [0, 100, 0, 100, 100][p];
-                buffer.data[(i * 4) + 2] = [0, 0, 100, 100, 0][p];
+                const o = findClosestIntersectingPlane(geo, ray)
+                buffer.data[(i * 4) + 0] = [100, 0, 0, 0, 100][o];
+                buffer.data[(i * 4) + 1] = [0, 100, 0, 100, 100][o];
+                buffer.data[(i * 4) + 2] = [0, 0, 100, 100, 0][o];
                 buffer.data[(i * 4) + 3] = 255;
             }
         }
