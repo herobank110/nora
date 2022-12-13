@@ -133,7 +133,9 @@
         function renderScene(buffer, geo, c, s) {
             for (let i = 0; i < s.h * s.w; i++) {
                 const ray = castCameraRay(c, s, i);
-                const o = findClosestIntersectingPlane(geo, ray)
+                // const o = findClosestIntersectingPlane(geo, ray);
+                const h = findClosestIntersectingPlane(geo, ray);
+                const o = geo.indexOf(h.g);
                 buffer.data[(i * 4) + 0] = [150, 0, 0, 0, 150][o];
                 buffer.data[(i * 4) + 1] = [0, 150, 0, 150, 150][o];
                 buffer.data[(i * 4) + 2] = [0, 0, 150, 150, 0][o];
@@ -174,23 +176,37 @@
         //     const intersections = [tc - t1c, tc + t1c];
         // }
 
-        /** @param {ray} r @param {plane} p @returns {undefined|vec} */
+        /** @param {ray} r @param {plane} p @returns {undefined|hit} */
         function intersectRayPlane(r, p) {
             const denom = vDot(p.u, r.u);
             if (Math.abs(denom) <= 1e-4) return;
             const t = -(vDot(p.u, r.p) + p.t) / vDot(p.u, r.u);
             if (t <= 1e-4) return;
-            return vAdd(r.p, vMul(r.u, t));
+            // return { t, p: vAdd(r.p, vMul(r.u, t)), n: p.u, g: p };
+            // return vAdd(r.p, vMul(r.u, t));
+            return {p:vAdd(r.p, vMul(r.u, t)), g: p}
         }
 
-        /** @param {plane[]} ps @param {ray} r @returns {number} plane index */
+        /** @param {plane[]} ps @param {ray} r @returns {hit|undefined} */
         function findClosestIntersectingPlane(ps, r) {
+            //   return ps
+            //     .map(p => intersectRayPlane(r, p))
+            //     .filter(x => x)
+            //     .sort((h1, h2) => h1.t < h2.t)
+            //     .find(_ => 1)
+            // return ps
+            //     .map((p, i) => [i, intersectRayPlane(r, p)])
+            //     .filter(([_, x]) => x)
+            //     .map(([i, x]) => [i, vLen(vSub(x, r.p))])
+            //     .sort(([_, d1], [__, d2]) => d1 - d2)
+            //     .map(([i]) => i)
+            //     .find(_ => 1)
             return ps
-                .map((p, i) => [i, intersectRayPlane(r, p)])
-                .filter(([_, x]) => x)
-                .map(([i, x]) => [i, vLen(vSub(x, r.p))])
+                .map((p, i) => intersectRayPlane(r, p))
+                .filter(x => x)
+                .map((x) => [x, vLen(vSub(x.p, r.p))])
                 .sort(([_, d1], [__, d2]) => d1 - d2)
-                .map(([i]) => i)
+                .map(([x]) => x)
                 .find(_ => 1)
         }
 
