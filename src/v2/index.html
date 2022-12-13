@@ -163,48 +163,17 @@
             };
         }
 
-        // /** @param {ray} r @param {sphere} s @returns {undefined|hit]} */
-        // function intersectRaySphere(r, s) {
-        //     const L = vSub(s.c, r.p);
-        //     const threshold = Math.sqrt(vDot(L, L) - s.r * s.r);
-        //     const b = vDot(L, r.u);
-        //     if (b < threshold) return;
-        //     const c = Math.sqrt(vDot(L, L) - b * b);
-        //     const t = Math.sqrt(s.r * s.r - c * c);
-        //     const d = b - t;
-        //     if (d < 1e-3) return;
-        //     return { g: s, p: vMul(vAdd(r.p, r.u), d), n: vNorm(-L + vMul(r.u, d)) };
-        // }
-
         /** @param {ray} r @param {sphere} s @returns {undefined|hit]} */
         function intersectRaySphere(r, s) {
             const L = vSub(s.c, r.p);
-            const tca = vDot(L, r.u);
-            if (tca < 0) return;
-            const d2 = vDot(L, L) - tca * tca;
-            const r2 = s.r * s.r
-            if (d2 > r2) return;
-            const thc = Math.sqrt(r2 - d2);
-            let t0 = tca - thc;
-            let t1 = tca + thc;
-            if (t0 > t1) [t0, t1] = [t1, t0];
-            if (t0 < 0) {
-                t0 = t1;  //if t0 is negative, let's use t1 instead 
-                if (t0 < 0) return;  //both t0 and t1 are negative 
-            }
-            t = t0;
-            return { g: s, p: vAdd(r.p, vMul(r.u, t)) }
-
-
-            // const L = vSub(s.c, r.p);
-            // const tc = vDot(L, r.u);
-            // if (tc < 0.0) return;
-            // const d2 = (tc * tc) - (L * L);
-            // const r2 = s.r * s.r;
-            // if (d2 > r2) return;
-            // const t1c = Math.sqrt(r2 - d2);
-            // const intersections = [ tc - t1c, tc + t1c];
-            // return { g: s, p: intersections[0]};
+            const threshold = Math.sqrt(vDot(L, L) - s.r * s.r);
+            const b = vDot(L, r.u);
+            if (b < threshold) return;
+            const c = Math.sqrt(vDot(L, L) - b * b);
+            const t = Math.sqrt(s.r * s.r - c * c);
+            const d = b - t;
+            if (d < 1e-3) return;
+            return { g: s, p: vMul(vAdd(r.p, r.u), d), n: vNorm(-L + vMul(r.u, d)) };
         }
 
         /** @param {ray} r @param {plane} p @returns {undefined|hit} */
