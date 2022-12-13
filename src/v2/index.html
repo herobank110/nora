@@ -12,11 +12,11 @@
     <script>
         /** @typedef {[number, number, number]} vec (xyz) */
         /** @typedef {[number, number, number, number]} quat  (wxyz) */
-        /** @typedef {{c: vec, r: number}} sphere */
-        /** @typedef {{u: vec, t: number}} plane */
+        /** @typedef {{ty: 's', c: vec, r: number}} sphere */
+        /** @typedef {{ty: 'p', u: vec, t: number}} plane */
         /** @typedef {{p: vec, u: vec}} ray */
         /** @typedef {{p: vec, n: vec, g: geo}} hit */
-        /** @typedef {(sphere | plane)[]} geo */
+        /** @typedef {sphere | plane} geo */
         /** @typedef {{w: number, h: number}} screen */
         /** @typedef {{p: vec, fd: vec, rt: vec, up: vec, hFov: number}} camera */
 
@@ -105,16 +105,16 @@
          * directions: up y axis, right x axis
          * units: centimeters
          * 
-         * @returns {geo}
+         * @returns {geo[]}
          * */
         function makeGeo() {
             return [
-                // { c: [10, 20, 0], r: 20 },  // sphere
-                { u: [1, 0, 0], t: 100 },  // left plane
-                { u: [1, 0, 0], t: -100 },  // right plane
-                { u: [0, 1, 0], t: 0 },  // floor plane
-                { u: [0, 1, 0], t: -200 },  // ceiling plane
-                { u: [0, 0, 1], t: -300 },  // back plane
+                { ty: 's', c: [10, 20, 50], r: 20 },  // sphere
+                { ty: 'p', u: [1, 0, 0], t: 100 },  // left plane
+                { ty: 'p', u: [1, 0, 0], t: -100 },  // right plane
+                { ty: 'p', u: [0, 1, 0], t: 0 },  // floor plane
+                { ty: 'p', u: [0, 1, 0], t: -200 },  // ceiling plane
+                { ty: 'p', u: [0, 0, 1], t: -300 },  // back plane
                 // TODO: light? material camera?
             ]
         }
@@ -126,15 +126,14 @@
 
         /**
          * @param {ImageData} buffer
-         * @param {geo} geo
+         * @param {geo[]} geo
          * @param {camera} c
          * @param {screen} s
          */
         function renderScene(buffer, geo, c, s) {
             for (let i = 0; i < s.h * s.w; i++) {
                 const ray = castCameraRay(c, s, i);
-                // const o = findClosestIntersectingPlane(geo, ray);
-                const h = findClosestIntersectingPlane(geo, ray);
+                const h = findClosestIntersection(geo, ray);
                 const o = geo.indexOf(h.g);
                 buffer.data[(i * 4) + 0] = [150, 0, 0, 0, 150][o];
                 buffer.data[(i * 4) + 1] = [0, 150, 0, 150, 150][o];
@@ -164,8 +163,20 @@
             };
         }
 
-        // /** @param {ray} r @param {sphere} s @returns {undefined|vec[]]} */
-        // function intersectRaySphere(r, s) {
+        /** @param {ray} r @param {sphere} s @returns {undefined|hit]} */
+        function intersectRaySphere(r, s) {
+            const L = vSub(s.c, r.p);
+            const threshold = Math.sqrt(vDot(L, L) - s.r * s.r);
+            const b = vDot(L, r.u);
+            if (b < threshold) return;
+            const s2 = Math.sqrt(vDot(L, L) - b * b);
+            const t = Math.sqrt(s.r * s.r - s2 * s2);
+            hit_distance = b - t;
+            if (hit_distance < 1e-3) return;
+            return { g: s, p: vMul(vAdd(r.p, r.u), hit_distance), n: vNorm(-L + vMul(r.u, hit_distance)) };
+        }
+
+        // function int2(r, s) {
         //     const L = vSub(s.c, r.p);
         //     const tc = vDot(L, r.u);
         //     if (tc < 0.0) return;
@@ -182,13 +193,18 @@
             if (Math.abs(denom) <= 1e-4) return;
             const t = -(vDot(p.u, r.p) + p.t) / vDot(p.u, r.u);
             if (t <= 1e-4) return;
-            return {p:vAdd(r.p, vMul(r.u, t)), g: p, n: p.u}
+            return { p: vAdd(r.p, vMul(r.u, t)), g: p, n: p.u }
         }
 
-        /** @param {plane[]} ps @param {ray} r @returns {hit|undefined} */
-        function findClosestIntersectingPlane(ps, r) {
-            return ps
-                .map((p, i) => intersectRayPlane(r, p))
+        /** @param {ray} r @param {geo} g */
+        function intersect(r, g) {
+            return { 'p': intersectRayPlane, 's': intersectRaySphere }[g.ty](r, g);
+        }
+
+        /** @param {geo[]} gs @param {ray} r @returns {hit|undefined} */
+        function findClosestIntersection(gs, r) {
+            return gs
+                .map((g, i) => intersect(r, g))
                 .filter(x => x)
                 .map((x) => [x, vLen(vSub(x.p, r.p))])
                 .sort(([_, d1], [__, d2]) => d1 - d2)
