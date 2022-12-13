@@ -15,7 +15,7 @@
         /** @typedef {{c: vec, r: number}} sphere */
         /** @typedef {{u: vec, t: number}} plane */
         /** @typedef {{p: vec, u: vec}} ray */
-        /** @typedef {{p: vec, n: vec, g: geo}} hit */
+        /** @typedef {{p: vec, n: vec, t: number, g: geo}} hit */
         /** @typedef {(sphere | plane)[]} geo */
         /** @typedef {{w: number, h: number}} screen */
         /** @typedef {{p: vec, fd: vec, rt: vec, up: vec, hFov: number}} camera */
@@ -90,6 +90,11 @@
 
         function degToRad(x) {
             return x / (360 / (2 * Math.PI));
+        }
+
+        /** @param {vec} u @param {vec} n */
+        function reflect(u, n) {
+            return vNorm(u + n * (vDot(n, -u)) * 2);
         }
 
         /**
