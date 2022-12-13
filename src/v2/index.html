@@ -15,7 +15,7 @@
         /** @typedef {{c: vec, r: number}} sphere */
         /** @typedef {{u: vec, t: number}} plane */
         /** @typedef {{p: vec, u: vec}} ray */
-        /** @typedef {{p: vec, n: vec, t: number, g: geo}} hit */
+        /** @typedef {{p: vec, n: vec, g: geo}} hit */
         /** @typedef {(sphere | plane)[]} geo */
         /** @typedef {{w: number, h: number}} screen */
         /** @typedef {{p: vec, fd: vec, rt: vec, up: vec, hFov: number}} camera */
@@ -182,25 +182,11 @@
             if (Math.abs(denom) <= 1e-4) return;
             const t = -(vDot(p.u, r.p) + p.t) / vDot(p.u, r.u);
             if (t <= 1e-4) return;
-            // return { t, p: vAdd(r.p, vMul(r.u, t)), n: p.u, g: p };
-            // return vAdd(r.p, vMul(r.u, t));
-            return {p:vAdd(r.p, vMul(r.u, t)), g: p}
+            return {p:vAdd(r.p, vMul(r.u, t)), g: p, n: p.u}
         }
 
         /** @param {plane[]} ps @param {ray} r @returns {hit|undefined} */
         function findClosestIntersectingPlane(ps, r) {
-            //   return ps
-            //     .map(p => intersectRayPlane(r, p))
-            //     .filter(x => x)
-            //     .sort((h1, h2) => h1.t < h2.t)
-            //     .find(_ => 1)
-            // return ps
-            //     .map((p, i) => [i, intersectRayPlane(r, p)])
-            //     .filter(([_, x]) => x)
-            //     .map(([i, x]) => [i, vLen(vSub(x, r.p))])
-            //     .sort(([_, d1], [__, d2]) => d1 - d2)
-            //     .map(([i]) => i)
-            //     .find(_ => 1)
             return ps
                 .map((p, i) => intersectRayPlane(r, p))
                 .filter(x => x)
