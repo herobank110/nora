@@ -10,6 +10,17 @@
 <body>
     <canvas width="300" height="200"></canvas>
     <script>
+        /** @typedef {[number, number, number]} vec (xyz) */
+        /** @typedef {[number, number, number, number]} quat  (wxyz) */
+        /** @typedef {{c: vec, r: number}} sphere */
+        /** @typedef {{u: vec, t: number}} plane */
+        /** @typedef {{p: vec, u: vec}} ray */
+        /** @typedef {{p: vec, n: vec, g: geo}} hit */
+        /** @typedef {(sphere | plane)[]} geo */
+        /** @typedef {{w: number, h: number}} screen */
+        /** @typedef {{p: vec, fd: vec, rt: vec, up: vec, hFov: number}} camera */
+
+
         let g_canvas = document.querySelector("canvas");
         let g_ctx = g_canvas.getContext("2d");
         main();
@@ -64,27 +75,9 @@
             return Math.sqrt(x * x + y * y + z * z);
         }
 
-        /** @returns {quat} */
-        function qFromAxisAngle([x, y, z], a) {
-            let s = Math.sin(a / 2);
-            return [Math.cos(a / 2), x * s, y * s, z * s];
-        }
-
-        /** @returns {[vec, number]} */
-        function qToAxisAngle([w, x, y, z]) {
-            let s = Math.sqrt(1 - w * w);
-            if (Math.abs(s) < 0.001) s = 1;
-            return [[x / s, y / s, z / s], 2 * Math.acos(w)]
-        }
-
-        /** @returns {quat} */
-        function qMul([aw, ax, ay, az], [bw, bx, by, bz]) {
-            return [
-                aw * bw - ax * bx - ay * by - az * bz,
-                ax * bw + aw * bx + ay * bz - az * by,
-                aw * by - ax * bz + ay * bw + az * bx,
-                aw * bz + ax * by - ay * bx + az * bw
-            ]
+        /** @param {vec} v */
+        function vNorm(v) {
+            return vMul(v, vLen(v));
         }
 
         /** @returns {vec} */
@@ -103,18 +96,13 @@
             return a + (b - a) * x;
         }
 
+        function mapRange(x, a, b, c, d) {
+            return lerp1(c, d, (x - a) / (b - a));
+        }
+
         function degToRad(x) {
             return x / (360 / (2 * Math.PI));
         }
-
-        /** @typedef {[number, number, number]} vec (xyz) */
-        /** @typedef {[number, number, number, number]} quat  (wxyz) */
-        /** @typedef {{c: vec, r: number}} sphere */
-        /** @typedef {{u: vec, t: number}} plane */
-        /** @typedef {{p: vec, u: vec}} ray */
-        /** @typedef {(sphere | plane)[]} geo */
-        /** @typedef {{w: number, h: number}} screen */
-        /** @typedef {{p: vec, u: quat, hFov: number}} camera */
 
         /**
          * defines scene geometry as list of objects
@@ -139,7 +127,7 @@
 
         /** @returns {camera} */
         function makeCamera() {
-            return { p: [0, 100, 0], u: qFromAxisAngle([0, 0, 1], 0), hFov: 70 }
+            return { p: [0, 100, 0], fd: [0, 0, 1], rt: [1, 0, 0], up: [0, 1, 0], hFov: 70 }
         }
 
         /**
@@ -166,21 +154,18 @@
 
         /** @param {camera} c @param {screen} s @param {number} i @returns {ray} */
         function castCameraRay(c, s, i) {
-            const row = Math.floor(i / s.w);
-            const col = i % s.w;
-
-            const hFov = degToRad(c.hFov);
-            const vFov = degToRad(getVFov(c, s));
-
-            const angleW = lerp1(hFov / 2, hFov / 2, col / s.w);
-            const angleH = lerp1(vFov / 2, -vFov / 2, row / s.h);
-
-            const qW = qFromAxisAngle([0, 1, 0], angleW);
-            const qH = qFromAxisAngle([-1, 0, 0], angleH);
-
-            const q = qMul(qMul(c.u, qW), qH);
-            const [axis] = qToAxisAngle(q)
-            return { p: c.p, u: axis };
+            const hPx = Math.floor(i / s.w)
+            const vPx = i % s.w;
+            const hFov = c.hFov;
+            const vFov = getVFov(c, s);
+            const hView = Math.tan(degToRad(hFov) / 2);
+            const vView = Math.tan(degToRad(vFov) / 2);
+            const hScale = mapRange(hPx, 0, s.w, -hView, hView);
+            const vScale = mapRange(vPx, 0, s.h, vView, -vView);
+            return {
+                p: c.p,
+                u: vNorm(vAdd(c.fd, vAdd(vMul(c.rt, hScale), vMul(c.up, vScale))))
+            };
         }
 
         // /** @param {ray} r @param {sphere} s @returns {undefined|vec[]]} */
